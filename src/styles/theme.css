@@ -1,0 +1,201 @@
+/* ==========================================================================
+   TOUCHLINE 99 — broadcast design system
+   Every skewed edge in the app uses --skew. Change it once, change it all.
+   ========================================================================== */
+
+:root {
+  /* --- ground --- */
+  --bg:        #0A0C10;   /* deep near-black, never pure black */
+  --surface:   #151922;   /* lifted charcoal for cards + panels */
+  --surface-2: #1D222D;
+  --line:      #272E3B;
+
+  /* --- text --- */
+  --ink:       #F2F5F9;
+  --ink-dim:   #97A1B0;
+  --ink-faint: #5C6675;
+
+  /* --- dynamic club theming (rewritten on team select) --- */
+  --accent:      #00B4D8;
+  --accent-ink:  #0A0C10;  /* readable text ON the accent */
+  --accent-soft: rgba(0, 180, 216, 0.14);
+  --accent-2:    #0A0C10;  /* club secondary */
+
+  /* --- fixed semantics: never take club theming --- */
+  --pos:    #21C97A;  /* goals, positive deltas */
+  --warn:   #F5B301;  /* yellow cards, warnings */
+  --neg:    #E5484D;  /* red cards, injuries */
+
+  /* --- turf --- */
+  --turf:      #2E7D4F;
+  --turf-dark: #256840;
+
+  /* --- motif --- */
+  --skew: -8deg;
+
+  --fast: 200ms;
+  --mid:  280ms;
+  --slow: 350ms;
+  --ease: cubic-bezier(0.22, 0.9, 0.25, 1);
+
+  --display: 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Tabular figures everywhere numbers align. A scoreline whose digits jitter
+   as the clock ticks reads as amateur instantly. */
+.num, .score, .clock, table td, table th, .stat-val, .ovr {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 0.92;
+}
+
+/* Tiny letter-spaced labels — the other half of the size contrast. */
+.label {
+  font-family: var(--body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   THE MOTIF — one skew angle, applied identically everywhere.
+   -------------------------------------------------------------------------- */
+.skew {
+  transform: skewX(var(--skew));
+}
+.skew > * {
+  transform: skewX(calc(var(--skew) * -1));  /* un-skew the contents */
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0;                 /* sports UI is sharp, not rounded */
+}
+
+.btn {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  padding: 12px 26px;
+  cursor: pointer;
+  transform: skewX(var(--skew));
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease),
+              transform var(--fast) var(--ease), border-color var(--fast) var(--ease);
+}
+.btn > span { display: inline-block; transform: skewX(calc(var(--skew) * -1)); }
+.btn:hover, .btn:focus-visible {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  transform: skewX(var(--skew)) translateX(6px);
+  outline: none;
+}
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-ghost { border-left-color: var(--line); background: transparent; }
+
+/* --------------------------------------------------------------------------
+   MOTION
+   -------------------------------------------------------------------------- */
+@keyframes wipe-in {
+  from { opacity: 0; transform: skewX(var(--skew)) translateX(48px); }
+  to   { opacity: 1; transform: skewX(0deg) translateX(0); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bar-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.screen {
+  height: 100%;
+  animation: wipe-in var(--slow) var(--ease) both;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.stagger > * { animation: rise var(--mid) var(--ease) both; }
+.stagger > *:nth-child(1) { animation-delay: 30ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 90ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 150ms; }
+.stagger > *:nth-child(6) { animation-delay: 180ms; }
+.stagger > *:nth-child(7) { animation-delay: 210ms; }
+.stagger > *:nth-child(8) { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SHARED BITS
+   -------------------------------------------------------------------------- */
+.stat-bar {
+  height: 8px;
+  background: var(--surface-2);
+  overflow: hidden;
+  transform: skewX(var(--skew));
+}
+.stat-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: bar-fill var(--slow) var(--ease) both;
+}
+
+.divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  transform: skewX(var(--skew));
+}
+
+.scrollable { overflow-y: auto; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
